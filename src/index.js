@@ -6,6 +6,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { createStore } from "redux";
 import deepForceUpdate from "react-deep-force-update";
+import disableScroll from "disable-scroll";
 
 import Reducer from "./Reducer";
 import initialState from './initialState';
@@ -30,7 +31,11 @@ class StoreUpdater extends Component {
     }
 }
 
-let vDOMInstance = ReactDOM.render(<StoreUpdater /> , document.getElementById('root'));
+disableScroll.on();
+
+let vDOMInstance = ReactDOM.render(
+    <StoreUpdater />   
+, document.getElementById('root'));
 
 store.subscribe(() => deepForceUpdate(vDOMInstance));
 

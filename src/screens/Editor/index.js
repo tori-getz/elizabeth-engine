@@ -11,6 +11,7 @@ import ProjectSettings from "../../components/ProjectSettings";
 import Sprites from "../../components/Sprites";
 import CodeEditor from "../../components/CodeEditor";
 import Code from "../../components/Code";
+import Scenes from "../../components/Scenes"
 
 class Editor extends Component {
     constructor () {
@@ -45,6 +46,7 @@ class Editor extends Component {
                 {this.props.opened.quit ? <Quit /> : ""}
                 {this.props.opened.logs ? <Logs /> : ""}
                 {this.props.opened.sprites ? <Sprites /> : ""}
+                {this.props.opened.scenes ? <Scenes /> : ""}
                 {this.props.opened.projectSettings ? <ProjectSettings /> : ""}
                 
                 {this.props.opened.code ? <Code /> : ""}
@@ -71,7 +73,7 @@ class Editor extends Component {
                         <AppBarButton icon="Play" label="Build & Run" onClick={this.runBuild}/>,
                         <AppBarButton icon="Video" label="Viewport" />,
                         <AppBarButton icon="ShowBcc" label="Entities" />,
-                        <AppBarButton icon="MapLayers" label="Scenes" />
+                        <AppBarButton icon="MapLayers" label="Scenes" onClick={this.props.openScenes} />
                     ]}
                     secondaryCommands={[
                         <p onClick={() => {
@@ -99,6 +101,7 @@ function mapDispatchToProps (dispatch) {
         openLogs: () => dispatch({ type: "OPEN_WINDOW", payload: "logs" }),
         openSprites: () => dispatch({ type: "OPEN_WINDOW", payload: "sprites" }),
         openCode: () => dispatch({ type: "OPEN_WINDOW", payload: "code" }),
+        openScenes: () => dispatch({ type: "OPEN_WINDOW", payload: "scenes" }),
         openProjectSettings: () => dispatch({ type: "OPEN_WINDOW", payload: "projectSettings" })
     };
 }
