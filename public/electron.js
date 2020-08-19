@@ -123,48 +123,6 @@ ipcMain.on("save_project", (event, message) => {
   event.reply("logs", { type: "stdout", logs: "Reload Project.json:\n\n" + rawProjectFile });
 });
 
-ipcMain.on("sprite_add", (event, message) => {
-  console.log("Add sprite...");
-
-  prompt(
-    {
-      title: "Sprite add",
-      label: "Name",
-      value: "",
-      type: "input"
-    }
-  )
-  .then(spriteName => {
-    console.log(`Sprite name: ${spriteName}`);
-    prompt(
-      {
-        title: "Sprite add",
-        label: "Path",
-        value: "",
-        type: "input"
-      }
-    )
-    .then(spritePath => {
-      console.log(`Sprite path: ${spritePath}`);
-
-      event.reply("new_sprite", { name: spriteName, path: spritePath });
-    });
-  });
-});
-
-
-ipcMain.on("sprite_edit", (event, message) => {
-  prompt(
-    {
-      title: "Sprite edit",
-      label: "Path",
-      value: "",
-      type: "input"
-    }
-  )
-  .then(response => event.reply("edit_path", response));
-});
-
 ipcMain.on("open_code", (event, file) => {
   let fileToOpen = path.resolve(CODE_DIRECTORY, file);
   
@@ -272,3 +230,82 @@ ipcMain.on("edit_code", (event, message) => {
     }
   });
 });
+
+ipcMain.on("add_sprite", (event) => {
+  console.log("Add new sprite");
+
+  prompt(
+    {
+      title: "Add sprite",
+      label: "Name",
+      type: 'input'
+    }
+  )
+  .then(spriteName => {
+    if (spriteName !== "" && spriteName !== null) {
+      console.log("Name: " + spriteName);
+
+      prompt(
+        {
+          title: "Add sprite",
+          label: "Path",
+          type: 'input'
+        }
+      )
+      .then(spritePath => {
+        if (spritePath !== "" && spritePath !== null) {
+          console.log("Path: " + spritePath);
+
+          let spriteInProject = {
+            id: uniqid(),
+            name: spriteName,
+            path: spritePath
+          };
+
+          event.reply("added_sprite", spriteInProject);
+        }
+      });
+    }
+  });
+});
+
+ipcMain.on("edit_sprite", (event, message) => {
+  console.log("Edit sprite");
+
+  prompt(
+    {
+      title: "Edit sprite",
+      label: "Name",
+      type: 'input',
+      default: message.name
+    }
+  )
+  .then(spriteName => {
+    if (spriteName !== "" && spriteName !== null) {
+      console.log("Name: " + spriteName);
+
+      prompt(
+        {
+          title: "Add sprite",
+          label: "Path",
+          type: 'input',
+          default: message.path
+        }
+      )
+      .then(spritePath => {
+        if (spritePath !== "" && spritePath !== null) {
+          console.log("Path: " + spritePath);
+
+          let spriteInProject = {
+            id: message.id,
+            name: spriteName,
+            path: spritePath
+          };
+
+          event.reply("updated_sprites", spriteInProject);
+        }
+      });
+    }
+  });
+});
+

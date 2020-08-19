@@ -1,7 +1,7 @@
 
 import React, { Component } from "react";
 import Draggable from "react-draggable";
-import { CommandBar, DropDownMenu, CheckBox, Button, TextBox } from "react-uwp";
+import { CommandBar, Button, TextBox } from "react-uwp";
 import { connect } from "react-redux";
 
 console.log(window.ipcRenderer);
@@ -22,7 +22,7 @@ class OpenProject extends Component {
         super();
 
         this.state = {
-            projectPath: "E:\Genesis\Elizabeth\Example"
+            projectPath: ""
         }
 
         this.changeProjectPath = this.changeProjectPath.bind(this);

@@ -1,7 +1,7 @@
 
 import React, { Component } from "react";
 import Draggable from "react-draggable";
-import { CommandBar, DropDownMenu, CheckBox, Button } from "react-uwp";
+import { CommandBar, DropDownMenu,  Button } from "react-uwp";
 import { connect } from "react-redux";
 
 const style = {

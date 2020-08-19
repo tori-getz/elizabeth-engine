@@ -6,9 +6,6 @@ import StartScreen from "./screens/StartScreen";
 import Editor from "./screens/Editor";
 
 class App extends Component {
-    constructor () {
-        super();
-    }
     render () {
         return (
             <div>

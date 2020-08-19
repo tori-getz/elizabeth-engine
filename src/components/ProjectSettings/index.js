@@ -154,7 +154,7 @@ class ProjectSettings extends Component {
 
     deleteVariable (id) {
         this.setState({
-            variables: this.state.variables.filter((e) => e.id != id),
+            variables: this.state.variables.filter((e) => e.id !== id),
             disabledSaveButton: false
         });
     }

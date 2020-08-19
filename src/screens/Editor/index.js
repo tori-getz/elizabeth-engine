@@ -44,8 +44,9 @@ class Editor extends Component {
 
                 {this.props.opened.quit ? <Quit /> : ""}
                 {this.props.opened.logs ? <Logs /> : ""}
-                {this.props.opened.projectSettings ? <ProjectSettings /> : ""}
                 {this.props.opened.sprites ? <Sprites /> : ""}
+                {this.props.opened.projectSettings ? <ProjectSettings /> : ""}
+                
                 {this.props.opened.code ? <Code /> : ""}
 
                 {!_.isEmpty(this.state.codeEdit)

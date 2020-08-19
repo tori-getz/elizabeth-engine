@@ -1,10 +1,9 @@
 
-import React, { Component } from "react";
+import React from "react"
 import Draggable from "react-draggable";
-import { CommandBar, ListView, AppBarButton, Menu, MenuItem } from "react-uwp";
+import { CommandBar, AppBarButton, Menu, MenuItem } from "react-uwp";
 import { connect } from "react-redux";
 import _ from "lodash";
-import Uniqid from "uniqid";
 
 const style = {
     wrapper: {
@@ -22,7 +21,7 @@ const style = {
     }
 }
 
-class Sprites extends Component {
+class Sprites extends React.Component {
     constructor () {
         super();
 
@@ -30,80 +29,78 @@ class Sprites extends Component {
             code: []
         }
 
-        this.removeCodeFile = this.removeCodeFile.bind(this);
         this.saveProject = this.saveProject.bind(this);
-        this.addCode = this.addCode.bind(this);
-        this.editCode = this.editCode.bind(this);
+        this.addSprite = this.addSprite.bind(this);
+        this.editSprite = this.editSprite.bind(this);
     }
 
     componentWillMount () {
-        window.ipcRenderer.on("added_code", (event, code) => {
-            let newCode = [...this.state.code];
+        window.ipcRenderer.on("added_sprite", (event, sprite) => {
+            let newSprites = !_.isEmpty(this.state.sprites) ? [...this.state.sprites] : [];
 
-            newCode.push(code);
+            newSprites.push(sprite);
 
             this.setState({
-                code: newCode
+                sprites: newSprites
             });
 
-            this.saveProject(newCode);
+            this.saveProject(newSprites);
+
+            this.forceUpdate();
         });
 
-        window.ipcRenderer.on("updated", (event, editedCode) => {
-            console.log(editedCode);
-            let newCode = [];
+        window.ipcRenderer.on("updated_sprite", (event, editedSprite) => {
+            console.log(editedSprite);
+            let newSprites = [];
 
-            for (let code of this.state.code) {
-                if (code.id === editedCode.id) {
-                    newCode.push(editedCode);
+            for (let sprite of this.state.sprites) {
+                if (sprite.id === editedSprite.id) {
+                    newSprites.push(editedSprite);
                 } else {
-                    newCode.push(code);
+                    newSprites.push(sprite);
                 }
             }
 
             this.setState({
-                code: newCode
+                sprites: newSprites
             });
 
-            this.saveProject(newCode);
+            this.saveProject(newSprites);
         });
 
         this.setState({
-            code: this.props.project.resources.code
+            sprites: this.props.project.resources.sprites
         });
     }
     
-    addCode () {
-        window.ipcRenderer.send("add_code");
+    addSprite () {
+        window.ipcRenderer.send("add_sprite");
     }
 
-    editCode (resource) {
-        window.ipcRenderer.send("edit_code", resource);
+    editSprite (resource) {
+        window.ipcRenderer.send("edit_sprite", resource);
     }
 
-    removeCodeFile (id) {
-        console.log(`Remove ${id}`);
-        let newCode = [];
+    removeSprite (id) {
+        let newSprites = [];
 
-        for (let codeResource of this.state.code) {
-            if (codeResource.id !== id) {
-                newCode.push(codeResource);
-            } else {
-                window.ipcRenderer.send("delete_code", codeResource.path);
+        for (let sprite of this.state.sprites) {
+            if (sprite.id !== id) {
+                newSprites.push(sprite);
             }
         }
 
         this.setState({
-            code: newCode
+            sprites: newSprites
         });
 
-        this.saveProject(newCode);
+        this.saveProject(newSprites);
     }
 
-    saveProject (newCode) {
+    saveProject (newSprites) {
         let newProject = {...this.props.project};
 
-        newProject.resources.code = newCode;
+        newProject.resources.sprites = newSprites;
 
         this.props.saveProjectInStore(newProject, this.props.workdir);
         
@@ -117,39 +114,34 @@ class Sprites extends Component {
             <Draggable>
                 <div style={style.wrapper}>
                     <CommandBar 
-                        content="Code"
+                        content="Sprites"
                         primaryCommands={[
                             <AppBarButton
                                 icon="Add"
                                 label="New"
-                                onClick={this.addCode}
+                                onClick={this.addSprite}
                             />
                         ]}
                         secondaryCommands={secondaryCommands}
                     />
 
                     <Menu menuItemHeight={36} expandedMethod="hover" style={{ width: "100%", marginTop: 20 }}>
-                        {!_.isEmpty(this.state.code)
+                        {!_.isEmpty(this.state.sprites)
                         ?
-                            this.state.code.map((codeResource, index) => {
-                                console.log(codeResource);
+                            this.state.sprites.map((spriteResource, index) => {
+                                console.log(spriteResource);
 
                                 return (
-                                    <MenuItem label={`${codeResource.name} ${codeResource.type === "joyhandler" ? "(Joy Handler)" : ""}`}>
+                                    <MenuItem label={`${spriteResource.name}`}>
                                         <MenuItem
                                             label="Edit"
-                                            icon="Code"
-                                            onClick={() => this.props.openCodeFile(codeResource.path)}
-                                        />
-                                        <MenuItem
-                                            label="Rename"
                                             icon="Edit"
-                                            onClick={() => this.editCode(codeResource)}
+                                            onClick={() => this.editSprite(spriteResource)}
                                         />
                                         <MenuItem
                                             label="Remove"
                                             icon="Remove"
-                                            onClick={() => this.removeCodeFile(codeResource.id)}
+                                            onClick={() => this.removeSprite(spriteResource.id)}
                                         />
                                     </MenuItem>
                                 );
