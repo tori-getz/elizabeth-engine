@@ -73,7 +73,7 @@ ipcMain.on("open_project", (event, arg) => {
       event.reply("load_project", { type: "found", payload: PROJECT_FILE });
     } catch (e) {
       console.log(e);
-      event,reply("load_project", { type: "error", payload: e });
+      event.reply("load_project", { type: "error", payload: e });
     }
   } else {
     console.log("Project file not found");
@@ -393,4 +393,14 @@ ipcMain.on("edit_scene", (event, message) => {
       });
     });
   });
+});
+
+ipcMain.on("load_sprite", (event, message) => {
+  let spriteDirectory = path.resolve(PROJECT_FILE_DIR, "Resources", message.path);
+
+  console.log(`Load sprite ${spriteDirectory}`);
+
+  let data = fs.readFileSync(spriteDirectory).toString('base64');
+
+  event.reply(`${message.name}_sprite_loaded`, data);
 });

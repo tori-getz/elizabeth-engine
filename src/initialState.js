@@ -8,7 +8,8 @@ export default {
         openProject: false,
         quit: false,
         logs: false,
-        sprit1es: false
+        sprit1es: false,
+        viewport: false
     },
     editScene: {
         id: "",
