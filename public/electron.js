@@ -309,3 +309,45 @@ ipcMain.on("edit_sprite", (event, message) => {
   });
 });
 
+ipcMain.on("add_scene", (event, message) => {
+  console.log("Add scene");
+  prompt({
+    title: "Add Scene",
+    label: "Name",
+    type: 'input',
+    default: ""
+  })
+  .then(sceneName => {
+    console.log(`Name - ${sceneName}`);
+
+    prompt({
+      title: "Add Scene",
+      label: "Joy handler",
+      type: 'input',
+      default: ""
+    })
+    .then(sceneJoyHandler => {
+      console.log(`Joy Handler - ${sceneJoyHandler}`);
+
+      prompt({
+        title: "Add Scene",
+        label: "Background color",
+        type: 'input',
+        default: ""
+      })
+      .then(sceneBackground => {
+        console.log(`Background color - ${sceneBackground}`);
+
+        let replyScene = {
+          id: uniqid(),
+          name: sceneName,
+          joyhandler: sceneJoyHandler,
+          background: sceneBackground,
+          entities: []
+        };
+
+        event.reply("scene_added", replyScene);
+      });
+    });
+  });
+});

@@ -8,7 +8,11 @@ export default {
         openProject: false,
         quit: false,
         logs: false,
-        sprites: false
+        sprit1es: false
+    },
+    editScene: {
+        id: "",
+        name: ""
     },
     workdir: "",
     codeEdit: [],

@@ -67,6 +67,7 @@ class Editor extends Component {
 
                 <CommandBar
                     isMinimal
+                    content={this.props.editScene.name}
                     labelPosition="right"
                     primaryCommands={[
                         <AppBarButton icon="CommandPrompt" label="Logs" onClick={this.props.openLogs} />,

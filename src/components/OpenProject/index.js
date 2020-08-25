@@ -4,8 +4,6 @@ import Draggable from "react-draggable";
 import { CommandBar, Button, TextBox } from "react-uwp";
 import { connect } from "react-redux";
 
-console.log(window.ipcRenderer);
-
 const style = {
     wrapper: {
         width: "400px",
@@ -46,7 +44,22 @@ class OpenProject extends Component {
             if (message.type === "found") {
                 console.log("Load project...");
 
-                this.props.loadProject(message.payload, this.state.projectPath);
+                let editScene = {
+                    name: "",
+                    id: ""
+                };
+
+                console.log(message);
+
+                for (let scene of message.payload.scenes) {
+
+                    if (scene.name === message.payload.mainScene) {
+                        editScene.name = scene.name;
+                        editScene.id = scene.id;
+                    }
+                }
+
+                this.props.loadProject(message.payload, this.state.projectPath, editScene);
             }
         });
 
@@ -92,7 +105,7 @@ function mapDispatchToProps (dispatch) {
     return {
         closeOpenProject: () => dispatch({ type: "CLOSE_WINDOW", payload: "openProject" }),
         editSettings: (settings) => dispatch({ type: "EDIT_SETTINGS", payload: settings }),
-        loadProject: (project, workdir) => dispatch({ type: "LOAD_PROJECT", payload: { project: project, workdir: workdir } })
+        loadProject: (project, workdir, editScene) => dispatch({ type: "LOAD_PROJECT", payload: { project: project, workdir: workdir, editScene: editScene } })
     }
 }
 

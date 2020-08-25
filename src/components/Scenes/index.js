@@ -1,7 +1,7 @@
 
 import React, { Component } from "react";
 import Draggable from "react-draggable";
-import { CommandBar, TextBox, AppBarButton, Separator, Menu, MenuItem } from "react-uwp";
+import { CommandBar, ListView, AppBarButton, Menu, MenuItem } from "react-uwp";
 import { connect } from "react-redux";
 import _ from "lodash";
 
@@ -12,8 +12,6 @@ const style = {
     },
     textbox: {
         marginTop: 10,
-        marginBottom: 10,
-        width: "100%"
     },
     text: {
         marginTop: 20,
@@ -28,8 +26,38 @@ class Scenes extends Component {
         super();
 
         this.state = {
-            backgroundColor: "712fbb"
-        };
+            scenes: []
+        }
+    }
+
+    componentWillMount () {
+        window.ipcRenderer.on("scene_added", (event, message) => {
+            console.log(message);
+
+            let newScenes = [...this.props.project.scenes];
+            newScenes.push(message);
+            
+            let editScene = {
+                name: message.name,
+                id: message.id
+            };
+
+            this.saveProject(newScenes);
+        });
+    }
+
+    addScene () {
+        window.ipcRenderer.send("add_scene");
+    }
+
+    saveProject (newScenes) {
+        let newProject = {...this.props.project};
+
+        newProject.scenes = newScenes;
+
+        this.props.saveProjectInStore(newProject, this.props.workdir);
+        
+        window.ipcRenderer.send("save_project", newProject);
     }
 
     render () {
@@ -44,75 +72,34 @@ class Scenes extends Component {
                             <AppBarButton
                                 icon="Add"
                                 label="New"
+                                onClick={this.addScene}
                             />
                         ]}
                         secondaryCommands={secondaryCommands}
                     />
 
-                    <div style={{
-                        width: "100%",
-                        height: 60,
-                        backgroundColor: "#" + this.state.backgroundColor,
-                        marginTop: 15,
-                        marginBottom: 15
-                    }}>
-                        <center>
-                            <br />
-                            <p> <b>Background color</b> </p>
-                        </center>
-                    </div>
-
-                    <TextBox
-                        style={style.textbox}
-                        placeholder="HEX color"
-                        defaultValue={this.state.backgroundColor}
-                        onChangeValue={this.changeProjectPath}
-                    />
-
-                    <TextBox
-                        style={{...style.textbox, marginBottom: 25}}
-                        placeholder="Joy handler"
-                        onChangeValue={this.changeProjectPath}
-                    />
-
-                    <Separator />
-
-                    <div style={{
-                        marginTop: 25
-                    }}>
-                        <Menu menuItemHeight={36} expandedMethod="hover" style={{ width: "100%", marginTop: 20 }}>
-                            <MenuItem label="Scene1" >
-                                <MenuItem
-                                    label="Rename"
-                                    icon="Edit"
-                                />
-                                <MenuItem
-                                    label="Remove"
-                                    icon="Remove"
-                                />
-                            </MenuItem>
-                            <MenuItem label="Scene2" >
-                                <MenuItem
-                                    label="Rename"
-                                    icon="Edit"
-                                />
-                                <MenuItem
-                                    label="Remove"
-                                    icon="Remove"
-                                />
-                            </MenuItem>
-                            <MenuItem label="Scene3" >
-                                <MenuItem
-                                    label="Rename"
-                                    icon="Edit"
-                                />
-                                <MenuItem
-                                    label="Remove"
-                                    icon="Remove"
-                                />
-                            </MenuItem>
-                        </Menu>
-                    </div>
+                    <Menu menuItemHeight={36} expandedMethod="hover" style={{ width: "100%", marginTop: 20 }}>
+                        {
+                            !_.isEmpty(this.props.project.scenes)
+                                ?
+                                    this.props.project.scenes.map((scene, index) => {
+                                        return (
+                                            <MenuItem label={scene.name}>
+                                                <MenuItem
+                                                    label="Edit"
+                                                    icon="Edit"
+                                                />
+                                                <MenuItem
+                                                    label="Remove"
+                                                    icon="Remove"
+                                                />
+                                            </MenuItem>
+                                        );
+                                    })
+                                :
+                                ""
+                        }
+                    </Menu>
                 </div>
             </Draggable>
         );
@@ -125,8 +112,8 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
     return {
-        closeSprites: () => dispatch({ type: "CLOSE_WINDOW", payload: "scenes" }),
-        saveProjectInStore: (project, workdir) => dispatch({ type: "SAVE_PROJECT", payload: { project: project, workdir: workdir } }),
+        closeScenes: () => dispatch({ type: "CLOSE_WINDOW", payload: "scenes" }),
+        saveProjectInStore: (project, workdir) => dispatch({ type: "SAVE_PROJECT", payload: { project: project, workdir: workdir } })
     }
 }
 
