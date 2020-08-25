@@ -3,14 +3,18 @@ import close from "./reducers/close";
 import open from "./reducers/open";
 import edtiSettings from "./reducers/edtiSettings";
 import loadProject from "./reducers/loadProject";
-import saveProject from "./reducers/saveProject";
 import openEdit from "./reducers/openEdit";
 import closeEdit from "./reducers/closeEdit";
+import setEditScene from "./reducers/setEditScene"
 
 export default function Reducer (state, action) {
     let newState = {...state};
     console.log(newState);
     switch (action.type) {
+        case "SET_EDIT_SCENE":
+            newState = setEditScene(action.payload, state);
+            return newState;
+
         case "OPEN_EDIT":
             newState = openEdit(action.payload, state);
             return newState;

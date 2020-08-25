@@ -351,3 +351,46 @@ ipcMain.on("add_scene", (event, message) => {
     });
   });
 });
+
+ipcMain.on("edit_scene", (event, message) => {
+  console.log("Edit scene");
+  prompt({
+    title: "Edit Scene",
+    label: "Name",
+    type: 'input',
+    default: message.name
+  })
+  .then(sceneName => {
+    console.log(`Name - ${sceneName}`);
+
+    prompt({
+      title: "Edit Scene",
+      label: "Joy handler",
+      type: 'input',
+      default: message.joyhandler
+    })
+    .then(sceneJoyHandler => {
+      console.log(`Joy Handler - ${sceneJoyHandler}`);
+
+      prompt({
+        title: "Edit Scene",
+        label: "Background color",
+        type: 'input',
+        default: message.background
+      })
+      .then(sceneBackground => {
+        console.log(`Background color - ${sceneBackground}`);
+
+        let replyScene = {
+          id: message.id,
+          name: sceneName,
+          joyhandler: sceneJoyHandler,
+          background: sceneBackground,
+          entities: []
+        };
+
+        event.reply("scene_edited", replyScene);
+      });
+    });
+  });
+});

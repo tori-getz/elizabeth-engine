@@ -28,6 +28,10 @@ class Scenes extends Component {
         this.state = {
             scenes: []
         }
+
+        this.setEditScene = this.setEditScene.bind(this);
+        this.addScene = this.addScene.bind(this);
+        this.removeScene = this.removeScene.bind(this);
     }
 
     componentWillMount () {
@@ -35,12 +39,24 @@ class Scenes extends Component {
             console.log(message);
 
             let newScenes = [...this.props.project.scenes];
-            newScenes.push(message);
             
-            let editScene = {
-                name: message.name,
-                id: message.id
-            };
+            newScenes.push(message);
+
+            this.saveProject(newScenes);
+        });
+
+        window.ipcRenderer.on("scene_edited", (event, message) => {
+            console.log(message);
+
+            let newScenes = [];
+
+            for (let scene of this.props.project.scenes) {
+                if (scene.id === message.id) {
+                    newScenes.push(message);
+                } else {
+                    newScenes.push(scene);
+                }
+            }
 
             this.saveProject(newScenes);
         });
@@ -48,6 +64,31 @@ class Scenes extends Component {
 
     addScene () {
         window.ipcRenderer.send("add_scene");
+    }
+
+    editScene (scene) {
+        window.ipcRenderer.send("edit_scene", scene);
+    }
+
+    setEditScene (id, name) {
+        let editScene = {
+            id: id,
+            name: name
+        };
+
+        this.props.setEditScene(editScene);
+    }
+
+    removeScene (idForRemove) {
+        let newScenes = [];
+
+        for (let scene of this.props.project.scenes) {
+            if (scene.id !== idForRemove) {
+                newScenes.push(scene);
+            }
+        }
+
+        this.saveProject(newScenes);
     }
 
     saveProject (newScenes) {
@@ -84,14 +125,19 @@ class Scenes extends Component {
                                 ?
                                     this.props.project.scenes.map((scene, index) => {
                                         return (
-                                            <MenuItem label={scene.name}>
+                                            <MenuItem
+                                                label={scene.name}
+                                                onClick={() => this.setEditScene(scene.id, scene.name)}    
+                                            >
                                                 <MenuItem
                                                     label="Edit"
                                                     icon="Edit"
+                                                    onClick={() => this.editScene(scene)}
                                                 />
                                                 <MenuItem
                                                     label="Remove"
                                                     icon="Remove"
+                                                    onClick={() => this.removeScene(scene.id)}
                                                 />
                                             </MenuItem>
                                         );
@@ -113,7 +159,8 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
     return {
         closeScenes: () => dispatch({ type: "CLOSE_WINDOW", payload: "scenes" }),
-        saveProjectInStore: (project, workdir) => dispatch({ type: "SAVE_PROJECT", payload: { project: project, workdir: workdir } })
+        saveProjectInStore: (project, workdir) => dispatch({ type: "SAVE_PROJECT", payload: { project: project, workdir: workdir } }),
+        setEditScene: (editScene) => dispatch({ type: "SET_EDIT_SCENE", payload: { editScene: editScene } })
     }
 }
 
